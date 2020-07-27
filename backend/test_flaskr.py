@@ -2,8 +2,8 @@ import json
 import random
 import unittest
 
-from .flaskr import create_app
-from .flaskr.models import setup_db, db, Category
+from flaskr import create_app
+from flaskr.models import setup_db, db, Category
 
 HOST = 'http://localhost:5000'
 

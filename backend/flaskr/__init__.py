@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
 
-from backend.flaskr.controllers import register_controllers
-from backend.flaskr.errorhandlers import register_handlers
-from backend.flaskr.models import setup_db
+from .controllers import register_controllers
+from .errorhandlers import register_handlers
+from .models import setup_db
 
 
 def create_app(test_config=None):

@@ -3,7 +3,7 @@ import random
 from flask import request, jsonify, Response, abort
 from sqlalchemy import or_, sql
 
-from backend.flaskr.models import Question, commit_session, Category
+from .models import Question, commit_session, Category
 
 QUESTIONS_PER_PAGE = 10
 
