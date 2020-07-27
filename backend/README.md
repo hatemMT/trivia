@@ -4,7 +4,7 @@
 
 ### Installing Dependencies
 
-#### Python 3.7
+#### Python 3.8
 
 Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
 
@@ -35,6 +35,10 @@ With Postgres running, restore a database using the trivia.psql file provided. F
 ```bash
 psql trivia < trivia.psql
 ```
+or with the Migration tool 
+```bash
+flask db upgrade
+```
 
 ## Running the server
 
@@ -52,42 +56,124 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
-## Tasks
 
-One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
+## Endpoints Documentation:
+- GET '/questions[?page=n][&searchTerm=searchterm]' →
+Returns all the questions available in pages of 10 items each and all the categories available 
+and with optional filtering by question name (case insensitive)
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers. 
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories. 
-3. Create an endpoint to handle GET requests for all available categories. 
-4. Create an endpoint to DELETE question using a question ID. 
-5. Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score. 
-6. Create a POST endpoint to get questions based on category. 
-7. Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question. 
-8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
+    `curl http://localhost:5000/questions?page=1&seachTerm=somequestion`
+    
+    - the page query parameter is optional if not set then returns page number 1
+    - the searchTerm is optional and if not provided all the items returned
+    - The response will be like that with status code `200 OK` :
+    ```json
+      {
+      "questions": [{"id": 1,
+                     "question": "Sample question",
+                     "answer": "Sample answer",
+                     "difficulty": 5,
+                     "category": 1
+                     }],
+      "total_questions": 1,
+      "categories": {"1": "sports"},
+      "current_category": null
+      }
+    ```
+- POST '/questions' → Add new question to the list
 
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
+    ```
+    curl -X POST http://localhost:5000/questions` -H 'Content-Type: application/json' \
+                                                -d '{"question":"Sample questions ?", \
+                                                "answer":"Sample answer", \
+                                                "difficulty": 5, \
+                                                "category": 1 \
+                                                    }'
+    
+    
+    ```
+    If the data is valid then the response will be json like that with status code `201 CREATED`  :
+    ```json
+    {
+    "id": 1,
+    "question": "Sample question",
+    "answer": "Sample answer",
+    "difficulty": 5,
+    "category": 1
+    }
+    ```
+    If the data is invalid then bad request retuned `400 BAD REQUEST` with body like that :
+    ```json
+        {
+          "message": "Validation Error, Please check the data"
+        }   
+     ``` 
+- GET `/categories/<cat_id>/questions` → Fetch the questions in a specific category
 
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+    ```bash
+        curl http://localhost:5000/categories/1/questions 
+    ``` 
+    If the category exitst then the sample response will be `200 OK` with body :
+    ```json
+    {
+      "questions": [{
+                    "id": 1,
+                    "question": "...",
+                    "answer": "...",
+                    "category": 1,
+                    "difficulty": 5
+                    }
+                ],
+      "total_questions": 20,
+      "current_category": 1
+    }  
+    ```
+   *Questions list is trimmed for simplicity*
+    
+    Else if the category is not found the `400 BAD REQUEST` returned with body 
+    ```json
+      {
+       "success": false,
+       "error": 400,
+       "message": "Bad request"
+      }
+    ```
+- DELETE '/questions/<qid>' → Delete the question with id specified in path param
+        sample request :
+                ```bash
+                    curl -X DELETE http://localhost:5000/questions/1
+                ``` 
+        sample response : `200 OK` with empty body
 
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
 
-```
+- POST '/quizzes' → Fetch the next random question for quiz 
+    depending on the passed data which is :
+
+    - previous questions ids
+    - the category of questions specified (if `0` is provided as category id then it indicates all categories)
+    
+    sample request command :
+    ```bash
+        curl -X POST http://localhost:5000/quizzes -H 'Content-Type: application/json' \
+                -d '{    \
+                        "previous_questions": [7,3,6], \
+                        "quiz_category" :{"id": 0} \
+                    }'
+    ```
+    Sample response if there is still questions matching criteria : 
+    ```json
+      {
+        "id": 8,
+        "question": "question text",
+        "answer": "anser text",
+        "category": 5,
+        "difficulty": 4
+      } 
+     ```
+     if there is no more questions then `404 NOT FOUND` response returns with body :
+     ```json
+        {"message": "Questions finished !"}
+     ```
 
 
 ## Testing
