@@ -5,6 +5,11 @@ import unittest
 from flaskr import create_app
 from flaskr.models import setup_db, db, Category
 
+DATABASE_HOST = '192.168.99.100'
+DATABASE_PORT = '5432'
+TRIVIA_DATABASE_NAME = "trivia_test"
+DATABASE_USER_PASSWORD = "admin:secret"
+
 HOST = 'http://localhost:5000'
 
 VALID_QUESTION = {
@@ -23,8 +28,8 @@ class TriviaTestCase(unittest.TestCase):
     def setUp(self):
         """Define test variables and initialize app."""
         self.app = create_app()
-        self.database_name = "trivia_test"
-        self.database_path = "postgresql://admin:secret@{}/{}".format('192.168.99.100:5432', self.database_name)
+        self.database_path = f"postgresql://{DATABASE_USER_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{TRIVIA_DATABASE_NAME}"  # .format(f'{DATABASE_HOST}:{DATABASE_PORT}',
+        #     TRIVIA_DATABASE_NAME)
         setup_db(self.app, self.database_path)
         self.db = db
         self.db.create_all()  # Create the schema

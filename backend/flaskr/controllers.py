@@ -2,6 +2,7 @@ import random
 
 from flask import request, jsonify, Response, abort
 from sqlalchemy import or_, sql
+from sqlalchemy.orm.exc import NoResultFound
 
 from .models import Question, commit_session, Category
 
@@ -54,7 +55,10 @@ def register_controllers(app):
         if request.content_type != 'application/json': abort(400)
         q_payload = request.get_json()
         validate(q_payload)
-        q_payload["category"] = Category.query.filter(Category.id == q_payload.get("category", -1)).one_or_none()
+        try:
+            q_payload["category"] = Category.query.filter(Category.id == q_payload.get("category", -1)).one()
+        except NoResultFound:
+            abort(500)
 
         new_q = Question(**q_payload)
         new_q.insert()

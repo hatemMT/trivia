@@ -32,10 +32,12 @@ This will install all of the required packages we selected within the `requireme
 
 ## Database Setup
 With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
-```bash
-psql trivia < trivia.psql
-```
-or with the Migration tool 
+#### The development environment suppose that the database are runnig on docker on host `192.168.99.100` port `5432`, so if you wanna change it fix it in the files :
+
+   - backend/flaskr/models.py → for the app database 
+   - backend/test_flaskr.py → for the test database
+
+Run Database Migration Upgrades By : 
 ```bash
 flask db upgrade
 ```
